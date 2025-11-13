@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vegas+ | Система заметок</title>
+    <title>Vegas+ | Информация</title>
     <link rel="icon" type="image/x-icon" href="https://i.postimg.cc/dVwByx97/2025-09-30-160005.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -33,6 +33,7 @@
             --role-head-mod: #2ed573;
             --role-mod: #1e90ff;
             --role-support: #ff6b81;
+            --role-leader: #ffcc00;
         }
         
         * {
@@ -153,7 +154,7 @@
         }
         
         .logo-text::after {
-            content: 'Система заметок';
+            content: 'Информация';
             position: absolute;
             bottom: -1.5rem;
             left: 0;
@@ -428,7 +429,7 @@
             border-color: var(--accent-gold);
         }
         
-        /* Модальное окно заметки */
+        /* Модальное окно для заметок */
         .modal {
             display: none;
             position: fixed;
@@ -698,8 +699,8 @@
             transform: rotate(90deg);
         }
         
-        /* Раздел персонала */
-        .staff-container {
+        /* ДРЕВОВИДНАЯ СТРУКТУРА ПЕРСОНАЛА */
+        .staff-tree {
             background-color: rgba(17, 17, 17, 0.7);
             border-radius: 15px;
             padding: 30px;
@@ -707,46 +708,80 @@
             backdrop-filter: blur(5px);
             box-shadow: var(--shadow);
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
         }
         
-        .staff-category {
-            margin-bottom: 40px;
-        }
-        
-        .staff-category:last-child {
-            margin-bottom: 0;
-        }
-        
-        .category-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+        .tree-container {
+            position: relative;
+            min-height: 600px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
         }
         
-        .category-title.head-mod {
-            color: var(--role-head-mod);
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 40px;
+            position: relative;
         }
         
-        .category-title.mod {
-            color: var(--role-mod);
+        .tree-level::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--accent-red), var(--accent-gold));
         }
         
-        .category-title.support {
-            color: var(--role-support);
+        .tree-level:first-child::before {
+            display: none;
         }
         
-        .staff-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        .tree-branch {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            position: relative;
+        }
+        
+        .tree-branch::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--accent-gold), transparent);
+        }
+        
+        .tree-node {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--accent-gold), var(--accent-red));
         }
         
         .staff-card {
-            background-color: rgba(17, 17, 17, 0.7);
+            background-color: rgba(17, 17, 17, 0.9);
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border);
@@ -754,23 +789,70 @@
             backdrop-filter: blur(5px);
             box-shadow: var(--shadow);
             position: relative;
+            width: 180px;
+            text-align: center;
+            z-index: 2;
         }
         
-        .staff-card.head-mod {
+        .staff-card.leader {
+            border: 2px solid var(--role-leader);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .staff-card.head {
             border-left: 4px solid var(--role-head-mod);
         }
         
-        .staff-card.mod {
+        .staff-card.senior {
             border-left: 4px solid var(--role-mod);
         }
         
-        .staff-card.support {
+        .staff-card.moderator {
             border-left: 4px solid var(--role-support);
         }
         
         .staff-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        
+        .staff-card.leader:hover {
+            transform: translateY(-10px) scale(1.15);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+        }
+        
+        .staff-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 12px;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+        
+        .staff-card.leader .staff-glow {
+            background: radial-gradient(circle at center, rgba(255, 204, 0, 0.3), transparent 70%);
+        }
+        
+        .staff-card.head .staff-glow {
+            background: radial-gradient(circle at center, rgba(46, 213, 115, 0.3), transparent 70%);
+        }
+        
+        .staff-card.senior .staff-glow {
+            background: radial-gradient(circle at center, rgba(30, 144, 255, 0.3), transparent 70%);
+        }
+        
+        .staff-card.moderator .staff-glow {
+            background: radial-gradient(circle at center, rgba(255, 107, 129, 0.3), transparent 70%);
+        }
+        
+        .staff-card:hover .staff-glow {
+            opacity: 1;
         }
         
         .staff-avatar {
@@ -782,47 +864,199 @@
             display: block;
             border: 3px solid var(--border);
             transition: var(--transition);
+            position: relative;
+            z-index: 2;
         }
         
         .staff-card:hover .staff-avatar {
-            transform: scale(1.1);
+            transform: scale(1.2);
             border-color: currentColor;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
         
         .staff-info {
-            padding: 0 20px 20px;
-            text-align: center;
+            padding: 0 15px 15px;
+            position: relative;
+            z-index: 2;
         }
         
         .staff-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 5px;
             color: var(--text-white);
         }
         
         .staff-role {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-gray);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .forum-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: linear-gradient(to right, var(--accent-red), #ff5e5e);
-            color: white;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 14px;
+        .staff-quote {
+            font-size: 11px;
+            color: var(--accent-gold);
+            font-style: italic;
+            margin-top: 5px;
+            padding: 5px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 5px;
+        }
+        
+        .tree-connector {
+            position: absolute;
+            background: linear-gradient(to bottom, var(--accent-gold), var(--accent-red));
+            z-index: 1;
+        }
+        
+        .tree-connector.vertical {
+            width: 2px;
+            height: 40px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .tree-connector.horizontal {
+            height: 2px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Анимация появления карточек */
+        @keyframes staffCardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .staff-card {
+            animation: staffCardAppear 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .staff-card:nth-child(1) { animation-delay: 0.1s; }
+        .staff-card:nth-child(2) { animation-delay: 0.2s; }
+        .staff-card:nth-child(3) { animation-delay: 0.3s; }
+        .staff-card:nth-child(4) { animation-delay: 0.4s; }
+        .staff-card:nth-child(5) { animation-delay: 0.5s; }
+        .staff-card:nth-child(6) { animation-delay: 0.6s; }
+        .staff-card:nth-child(7) { animation-delay: 0.7s; }
+        .staff-card:nth-child(8) { animation-delay: 0.8s; }
+        .staff-card:nth-child(9) { animation-delay: 0.9s; }
+        .staff-card:nth-child(10) { animation-delay: 1.0s; }
+        
+        /* Секция наказаний */
+        .punishments-section {
+            background-color: rgba(17, 17, 17, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(5px);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .punishment-category {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .punishment-category:last-child {
+            border-bottom: none;
+        }
+        
+        .punishment-title {
+            font-size: 22px;
             font-weight: 600;
-            transition: var(--transition);
+            margin-bottom: 15px;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .forum-btn:hover {
-            background: linear-gradient(to right, var(--accent-red-dark), #ff4e4e);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 46, 46, 0.3);
+        .punishment-title i {
+            color: var(--accent-red);
+        }
+        
+        .punishment-item {
+            background: rgba(10, 10, 10, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-red);
+        }
+        
+        .punishment-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .punishment-name i {
+            color: var(--accent-gold);
+        }
+        
+        .punishment-description {
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .punishment-penalty {
+            color: var(--accent-red);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .punishment-rules {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 46, 46, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-red);
+        }
+        
+        .punishment-rules-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-white);
+        }
+        
+        .punishment-rules-list {
+            padding-left: 20px;
+        }
+        
+        .punishment-rules-list li {
+            margin-bottom: 8px;
+            color: var(--text-gray);
+        }
+        
+        .final-message {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-gold);
+            font-style: italic;
         }
         
         /* Футер */
@@ -865,8 +1099,16 @@
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             }
             
-            .staff-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .staff-card {
+                width: 160px;
+            }
+            
+            .staff-name {
+                font-size: 14px;
+            }
+            
+            .staff-role {
+                font-size: 11px;
             }
         }
         
@@ -885,8 +1127,17 @@
                 justify-content: center;
             }
             
-            .staff-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            .tree-branch {
+                gap: 20px;
+            }
+            
+            .staff-card {
+                width: 140px;
+            }
+            
+            .staff-avatar {
+                width: 70px;
+                height: 70px;
             }
         }
         
@@ -904,8 +1155,43 @@
                 padding: 25px;
             }
             
-            .staff-grid {
-                grid-template-columns: 1fr;
+            .tree-level {
+                margin-bottom: 30px;
+            }
+            
+            .tree-branch {
+                gap: 15px;
+            }
+            
+            .staff-card {
+                width: 130px;
+            }
+            
+            .staff-avatar {
+                width: 60px;
+                height: 60px;
+                margin: 15px auto 10px;
+            }
+            
+            .staff-info {
+                padding: 0 10px 10px;
+            }
+            
+            .staff-name {
+                font-size: 13px;
+            }
+            
+            .staff-role {
+                font-size: 10px;
+                min-height: 28px;
+            }
+            
+            .punishments-section {
+                padding: 20px;
+            }
+            
+            .punishment-title {
+                font-size: 18px;
             }
         }
         
@@ -935,6 +1221,40 @@
             .priority-options {
                 flex-direction: column;
             }
+            
+            .staff-tree {
+                padding: 20px;
+            }
+            
+            .tree-branch {
+                gap: 10px;
+            }
+            
+            .staff-card {
+                width: 110px;
+            }
+            
+            .staff-avatar {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .staff-name {
+                font-size: 12px;
+            }
+            
+            .staff-role {
+                font-size: 9px;
+                min-height: 24px;
+            }
+            
+            .punishments-section {
+                padding: 15px;
+            }
+            
+            .punishment-title {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -942,21 +1262,21 @@
     <!-- Экран загрузки -->
     <div id="loading-screen">
         <div class="loading-logo">
-            <i class="fas fa-sticky-note loading-logo-icon"></i>
-            <span class="loading-logo-text">VEGAS+ NOTES</span>
+            <i class="fas fa-crown loading-logo-icon"></i>
+            <span class="loading-logo-text">VEGAS+</span>
         </div>
         <div class="loading-bar">
             <div class="loading-progress" id="loading-progress"></div>
         </div>
-        <div class="loading-text">Загрузка системы заметок...</div>
+        <div class="loading-text">Загрузка...</div>
     </div>
 
     <div class="container">
         <!-- Верхняя панель -->
         <div class="top-bar">
             <div class="logo">
-                <i class="fas fa-sticky-note logo-icon"></i>
-                <span class="logo-text">VEGAS+ NOTES</span>
+                <i class="fas fa-crown logo-icon"></i>
+                <span class="logo-text">VEGAS+</span>
             </div>
         </div>
 
@@ -964,6 +1284,7 @@
         <div class="nav-tabs">
             <div class="nav-tab active" data-tab="notes">Умные заметки</div>
             <div class="nav-tab" data-tab="staff">Персонал</div>
+            <div class="nav-tab" data-tab="punishments">Виды наказаний</div>
         </div>
 
         <!-- Вкладка заметок -->
@@ -987,127 +1308,170 @@
             </div>
         </div>
 
-        <!-- Вкладка персонала -->
+        <!-- Вкладка персонала с древовидной структурой -->
         <div id="staff" class="tab-content">
-            <div class="staff-container">
-                <div class="staff-category">
-                    <h2 class="category-title head-mod">
-                        <i class="fas fa-crown"></i>
-                        Head Moderation
-                    </h2>
-                    <div class="staff-grid">
-                        <div class="staff-card head-mod">
-                            <img src="https://i.pravatar.cc/150?img=1" alt="Homer Simpson" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Homer Simpson</div>
-                                <div class="staff-role">Главный модератор</div>
-                                <a href="https://forum.arzguard.com/members/601/" class="forum-btn" target="_blank">Форумник</a>
-                            </div>
-                        </div>
-                        
-                        <div class="staff-card head-mod">
-                            <img src="https://yastatic.net/naydex/yandex-search/iyG70ff00/8c1788quZ/wDak2dBg6YdEWJCNWPYGR-sfBUOdfif4bE0wvtqMRr9sUXUdu8oB4NpUrYAKjDuKP9JrYwInyU5Kx2h509bWxRCT6Oko1CA7-LRhfZhumu-begVrnU4j7Bzg-" alt="Виктор Иванович" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Виктор Иванович</div>
-                                <div class="staff-role">Главный модератор</div>
-                                <a href="https://forum.arzguard.com/members/1371/" class="forum-btn" target="_blank">Форумник</a>
-                            </div>
-                        </div>
-                        
-                        <div class="staff-card head-mod">
-                            <img src="https://i.pravatar.cc/150?img=3" alt="FRASH" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">FRASH</div>
-                                <div class="staff-role">Главный модератор</div>
-                                <a href="https://forum.arzguard.com/members/37892/" class="forum-btn" target="_blank">Форумник</a>
-                            </div>
-                        </div>
-                        
-                        <div class="staff-card head-mod">
-                            <img src="https://i.pravatar.cc/150?img=9" alt="Софья Абрамова" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Софья Абрамова</div>
-                                <div class="staff-role">Главный модератор</div>
-                                <a href="https://forum.arzguard.com/members/38640/" class="forum-btn" target="_blank">Форумник</a>
+            <div class="staff-tree">
+                <div class="tree-container">
+                    <!-- Уровень 1: Руководитель сервера -->
+                    <div class="tree-level">
+                        <div class="tree-node">
+                            <div class="tree-connector vertical"></div>
+                            <div class="staff-card leader">
+                                <div class="staff-glow"></div>
+                                <img src="https://i.pravatar.cc/150?img=5" alt="Андрюха" class="staff-avatar">
+                                <div class="staff-info">
+                                    <div class="staff-name">Андрюха</div>
+                                    <div class="staff-role">Руководитель сервера</div>
+                                    <div class="staff-quote">"Если что-то пошло не так - это фича!"</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="staff-category">
-                    <h2 class="category-title mod">
-                        <i class="fas fa-shield-alt"></i>
-                        Moderator
-                    </h2>
-                    <div class="staff-grid">
-                        <div class="staff-card mod">
-                            <img src="https://i.pravatar.cc/150?img=7" alt="Александр Дмитриевич" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Александр Дмитриевич</div>
-                                <div class="staff-role">Модератор</div>
-                                <a href="https://forum.arzguard.com/members/39530/" class="forum-btn" target="_blank">Форумник</a>
+                    
+                    <!-- Уровень 2: ГМ и ЗГМ -->
+                    <div class="tree-level">
+                        <div class="tree-branch">
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card head">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=68" alt="Виктор Иванович" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Виктор Иванович</div>
+                                        <div class="staff-role">Главный модератор</div>
+                                        <div class="staff-quote">"Правила существуют не для того, чтобы их нарушать"</div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="staff-card mod">
-                            <img src="https://i.pravatar.cc/150?img=6" alt="Александр Иванович" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Александр Иванович</div>
-                                <div class="staff-role">Модератор</div>
-                                <a href="https://forum.arzguard.com/members/39087/" class="forum-btn" target="_blank">Форумник</a>
-                            </div>
-                        </div>
-                        
-                        <div class="staff-card mod">
-                            <img src="https://i.postimg.cc/LJsCJBLc/c1e61ba1-b00f-4002-9a14-fc24892240da.jpg" alt="Шпулечка" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Шпулечка</div>
-                                <div class="staff-role">Модератор</div>
-                                <a href="https://forum.arzguard.com/members/36667/" class="forum-btn" target="_blank">Форумник</a>
-                            </div>
-                        </div>
-                        
-                        <div class="staff-card mod">
-                            <img src="https://i.pravatar.cc/150?img=8" alt="Sanders" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Sanders</div>
-                                <div class="staff-role">Модератор</div>
-                                <a href="https://forum.arzguard.com/members/17379/" class="forum-btn" target="_blank">Форумник</a>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card head">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=3" alt="FRASH" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">FRASH</div>
+                                        <div class="staff-role">Заместитель главного модератора</div>
+                                        <div class="staff-quote">"Справедливость превыше всего"</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="staff-category">
-                    <h2 class="category-title support">
-                        <i class="fas fa-headset"></i>
-                        Support
-                    </h2>
-                    <div class="staff-grid">
-                        <div class="staff-card support">
-                            <img src="https://yastatic.net/naydex/yandex-search/iyG71ff68/8c1788quZ/wDak2dBg6YdEWJCNWPYGR-sfBUOdfif4bE0wvtqMRr9sUXUdu8oB4NpYvaAWjD-CS4p7Zx4_1WJOwxnxtlrP5IQOdHScSFhD9MxVSYA6mstbxll_sT8PhUAUYFYc" alt="Vladimir Andreevich" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Vladimir Andreevich</div>
-                                <div class="staff-role">Поддержка</div>
-                                <a href="https://forum.arzguard.com/members/38266/" class="forum-btn" target="_blank">Форумник</a>
+                    
+                    <!-- Уровень 3: Куратор модерации -->
+                    <div class="tree-level">
+                        <div class="tree-node">
+                            <div class="tree-connector vertical"></div>
+                            <div class="staff-card head">
+                                <div class="staff-glow"></div>
+                                <img src="https://i.pravatar.cc/150?img=9" alt="Софья Александровна" class="staff-avatar">
+                                <div class="staff-info">
+                                    <div class="staff-name">Софья Александровна</div>
+                                    <div class="staff-role">Куратор модерации</div>
+                                    <div class="staff-quote">"Порядок должен быть во всем"</div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="staff-card support">
-                            <img src="https://i.pravatar.cc/150?img=10" alt="emrys" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">emrys</div>
-                                <div class="staff-role">Поддержка</div>
-                                <a href="https://forum.arzguard.com/members/8555/" class="forum-btn" target="_blank">Форумник</a>
+                    </div>
+                    
+                    <!-- Уровень 4: Старшие модераторы -->
+                    <div class="tree-level">
+                        <div class="tree-branch">
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card senior">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=12" alt="163Midn1ght ♡" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">163Midn1ght ♡</div>
+                                        <div class="staff-role">Старший модератор</div>
+                                        <div class="staff-quote">"Ночь - мое время!"</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card senior">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=7" alt="Александр Дмитриевич" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Александр Дмитриевич</div>
+                                        <div class="staff-role">Старший модератор</div>
+                                        <div class="staff-quote">"Всегда на страже порядка"</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card senior">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=13" alt="Свежевыжатый сок" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Свежевыжатый сок</div>
+                                        <div class="staff-role">Старший модератор</div>
+                                        <div class="staff-quote">"Сок - это сила!"</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card senior">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=8" alt="Sanders" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Sanders</div>
+                                        <div class="staff-role">Старший модератор</div>
+                                        <div class="staff-quote">"Ничего личного, только правила"</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="staff-card support">
-                            <img src="https://i.pravatar.cc/150?img=11" alt="Malloy_Vegas" class="staff-avatar">
-                            <div class="staff-info">
-                                <div class="staff-name">Malloy_Vegas</div>
-                                <div class="staff-role">Поддержка</div>
-                                <a href="https://forum.arzguard.com/members/28237/" class="forum-btn" target="_blank">Форумник</a>
+                    </div>
+                    
+                    <!-- Уровень 5: Модераторы -->
+                    <div class="tree-level">
+                        <div class="tree-branch">
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card moderator">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=14" alt="Дориан Маэстроўскі" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Дориан Маэстроўскі</div>
+                                        <div class="staff-role">Модератор</div>
+                                        <div class="staff-quote">"Искусство требует жертв... правил!"</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card moderator">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=11" alt="Malloy" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">Malloy</div>
+                                        <div class="staff-role">Модератор</div>
+                                        <div class="staff-quote">"Всегда готов к работе"</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-node">
+                                <div class="tree-connector vertical"></div>
+                                <div class="staff-card moderator">
+                                    <div class="staff-glow"></div>
+                                    <img src="https://i.pravatar.cc/150?img=32" alt="!Andreevich" class="staff-avatar">
+                                    <div class="staff-info">
+                                        <div class="staff-name">!Andreevich</div>
+                                        <div class="staff-role">Модератор</div>
+                                        <div class="staff-quote">"Восклицательный знак - моя фишка!"</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1115,13 +1479,122 @@
             </div>
         </div>
         
+        <!-- Вкладка наказаний -->
+        <div id="punishments" class="tab-content">
+            <div class="punishments-section">
+                <div class="punishment-category">
+                    <h2 class="punishment-title"><i class="fas fa-gavel"></i> Основные нарушения</h2>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-comment-slash"></i> НИЧ (Нерациональное использование чата)</div>
+                        <div class="punishment-description">Если человек отправляет точки, первый раз мы удаляем сообщение и предупреждаем об этом, что так делать нельзя.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: 30 минут мута</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-font"></i> Капс</div>
+                        <div class="punishment-description">Выдается за капс, типы "КаК - То ТаК" или "ОБЫЧНЫЙ" капс более 3-х символов (не включительно).</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Мут на 60 минут</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-comments"></i> Оффтоп</div>
+                        <div class="punishment-description">Это когда в канал такие, как Screenshots, команды, общий чат конференции, когда не идет конференция, писать ерунду не по теме.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: от 1 до 4 часов, в зависимости от тяжести нарушения</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-skull-crossbones"></i> Скам/реклама</div>
+                        <div class="punishment-description">По типу скам/реклама ссылок читов или "перейди по ссылке стима и введи данные, получишь 10$".</div>
+                        <div class="punishment-penalty"><i class="fas fa-ban"></i> Вид наказания: Бан 999 дней с причиной "Скам реклама" или "Скам ссылка"</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-user-friends"></i> Оскорбление родни</div>
+                        <div class="punishment-description">За оскорбление родни в любом формате.</div>
+                        <div class="punishment-penalty"><i class="fas fa-calendar-times"></i> Вид наказания: от 7 до 30 дней, в зависимости от тяжести нарушения</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-link"></i> Ссылки в описании чужих дискорд-каналов</div>
+                        <div class="punishment-description">После предупреждения в warning изменений нет.</div>
+                        <div class="punishment-penalty"><i class="fas fa-calendar-times"></i> Вид наказания: от 7 до 30 дней</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-user-shield"></i> Оскорбление модерации</div>
+                        <div class="punishment-description">Оскорбление модерации в любой форме.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: от 30 минут до 12 часов мута, бан от 5 до 30 дней, в зависимости от тяжести нарушения</div>
+                    </div>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-exclamation-triangle"></i> Провокация модерации</div>
+                        <div class="punishment-description">Провокационные действия в отношении модерации.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: от 30 минут до 12 часов мута, в зависимости от тяжести ситуации</div>
+                    </div>
+                </div>
+                
+                <div class="punishment-category">
+                    <h2 class="punishment-title"><i class="fas fa-store"></i> Нарушение правил рынка</h2>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-shopping-cart"></i> Общие нарушения</div>
+                        <div class="punishment-description">Нарушение правил размещения объявлений на рынке.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: от 1 до 8 часов мута, в зависимости от тяжести ситуации. 8 часов, если пользователь создал объявление не по теме.</div>
+                    </div>
+                    
+                    <div class="punishment-rules">
+                        <div class="punishment-rules-title">Запрещено на рынке:</div>
+                        <ul class="punishment-rules-list">
+                            <li>Запрещено размещение оскорбительного, ненавистного или незаконного контента.</li>
+                            <li>Не допускаются публикации, содержащие спам, рекламу сторонних ресурсов.</li>
+                            <li>Уважайте пользователей площадки. Оскорбления и негативные комментарии будут удалены, а нарушители будут наказаны.</li>
+                            <li>Нарушать форму подачи/заголовка объявления.</li>
+                            <li>Запрещено писать сообщения не по теме объявления/веток (оффтоп).</li>
+                            <li>Нарушать правила Discord сервера (мера наказания предусматривается по правилам сервера).</li>
+                            <li>В случае, если публикация неактивна 24 часа - она закрывается и блокируется.</li>
+                            <li>Запрещено поднимать публикацию вверх - "up" и другие способы поднятия публикации.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="punishment-category">
+                    <h2 class="punishment-title"><i class="fas fa-heart"></i> Нарушение правил знакомства</h2>
+                    
+                    <div class="punishment-item">
+                        <div class="punishment-name"><i class="fas fa-users"></i> Общие нарушения</div>
+                        <div class="punishment-description">Нарушение правил размещения объявлений в разделе знакомств.</div>
+                        <div class="punishment-penalty"><i class="fas fa-clock"></i> Вид наказания: от 1 до 8 часов мута, в зависимости от тяжести ситуации. 8 часов, если пользователь создал объявление не по теме.</div>
+                    </div>
+                    
+                    <div class="punishment-rules">
+                        <div class="punishment-rules-title">Запрещено в разделе знакомств:</div>
+                        <ul class="punishment-rules-list">
+                            <li>Запрещено размещение оскорбительного, ненавистного или незаконного контента.</li>
+                            <li>Не допускаются публикации, содержащие спам, рекламу сторонних ресурсов.</li>
+                            <li>Уважайте пользователей площадки. Оскорбления и негативные комментарии будут удалены, а нарушители будут наказаны.</li>
+                            <li>Нарушать форму подачи/заголовка объявления.</li>
+                            <li>Запрещено писать сообщения не по теме объявления/веток (оффтоп).</li>
+                            <li>Нарушать правила Discord сервера (мера наказания предусматривается по правилам сервера).</li>
+                            <li>В случае, если публикация неактивна 24 часа - она закрывается и блокируется.</li>
+                            <li>Запрещено поднимать публикацию вверх - "up" и другие способы поднятия публикации.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="final-message">
+                    <i class="fas fa-lightbulb"></i> И запомните, ребята, самое важное: не бойтесь допускать ошибки, главное - учиться на ошибках.
+                </div>
+            </div>
+        </div>
+        
         <!-- Футер -->
         <div class="footer">
             <div class="footer-logo">
-                <i class="fas fa-sticky-note footer-logo-icon"></i>
-                <span class="footer-logo-text">VEGAS+ NOTES</span>
+                <i class="fas fa-crown footer-logo-icon"></i>
+                <span class="footer-logo-text">VEGAS+</span>
             </div>
-            <p>Система управления заметками</p>
+            <p>Разработано специально для модерации</p>
             <p>Arizona Games</p>
         </div>
     </div>
@@ -1509,9 +1982,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
